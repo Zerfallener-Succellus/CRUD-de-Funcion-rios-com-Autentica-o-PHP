@@ -1,14 +1,84 @@
-
+version: '3.8'
 services:
+  # Serviço da Aplicação (Laravel/PHP)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: crud_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - laravel-net
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    # --- ADICIONE ESTA LINHA ---
+    command: sh -c "php artisan migrate --force && php-fpm"
 
-  db:
-    image: mysql
-    container_name: mysql_db
-    restart: always
+  # Serviço do Servidor Web (Nginx)
+  nginx:
+    image: nginx:1.19-alpine
+    container_name: crud_nginx
+    restart: unless-stopped
     ports:
-      - "3306:3306"
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - laravel-net
+
+  # Serviço do Banco de Dados (MySQL)
+  mysql_db:
+    image: mysql:8.0
+    container_name: crud_mysql_db
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-laravel}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_USER: ${DB_USERNAME:-user}
+    volumes:
+      - ./docker-data/mysql:/var/lib/mysql
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    networks:
+      - laravel-net
+    healthcheck:
+       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+       timeout: 20s
+       retries: 10
+       start_period: 10s
+    
+
+  # --- NOVO SERVIÇO APENAS PARA DESENVOLVIMENTO ---
+  vite:
+    # Usa uma imagem leve do Node.js
+    image: node:18-alpine
+    container_name: crud_vite
+    working_dir: /var/www/html
+    # Mapeia o código da aplicação para dentro do container
+    volumes:
+      - ./:/var/www/html
+    # Expõe a porta do Vite
+    ports:
+      - "5173:5173"
+    # Comando que será executado ao iniciar o container
+    command: sh -c "npm install && npm run dev"
+    
+    networks:
+      - laravel-net
+    # A MÁGICA: Este serviço só será iniciado quando o perfil 'dev' for ativado
+    profiles:
+      - dev
+
+    
+
+networks:
+  laravel-net:
+    driver: bridge

@@ -1,0 +1,275 @@
+openapi: 3.0.0
+info:
+  title: "API de CRUD de Funcionários"
+  description: |-
+    Esta API gerencia o cadastro de funcionários de uma empresa, protegida por um sistema de autenticação baseado em token. 
+    Desenvolvida como parte do desafio para vaga de programador.
+  version: "1.0.0"
+  contact:
+    email: "connectatecnologia.dev@gmail.com"
+
+servers:
+  - url: http://localhost:8000/api
+    description: Servidor de Desenvolvimento Local
+
+# Define os componentes reutilizáveis (modelos e segurança)
+components:
+  schemas:
+    Funcionario:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ID único do funcionário.
+          example: 1
+        nome:
+          type: string
+          description: Nome completo do funcionário.
+          example: "João da Silva"
+        cpf:
+          type: string
+          description: CPF do funcionário (sem formatação).
+          example: "12345678901"
+        data_nascimento:
+          type: string
+          format: date
+          description: Data de nascimento.
+          example: "1990-05-15"
+        telefone:
+          type: string
+          description: Telefone de contato.
+          example: "11987654321"
+        genero:
+          type: string
+          description: Gênero do funcionário.
+          enum: [Masculino, Feminino, Outro]
+          example: "Masculino"
+        created_at:
+          type: string
+          format: date-time
+          description: Data de criação do registro.
+        updated_at:
+          type: string
+          format: date-time
+          description: Data da última atualização.
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Mensagem de erro principal.
+        errors:
+          type: object
+          description: Detalhes dos erros de validação.
+  
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      description: "Token de autenticação obtido na rota /login"
+
+# Define a segurança global para os endpoints protegidos
+security:
+  - BearerAuth: []
+
+# Descreve todos os endpoints (caminhos) da API
+paths:
+  /registrar:
+    post:
+      tags:
+        - Autenticação
+      summary: Registra um novo usuário
+      description: Cria um novo usuário no sistema para permitir a autenticação.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, password, password_confirmation]
+              properties:
+                name:
+                  type: string
+                  example: "Pedro Lucas"
+                email:
+                  type: string
+                  format: email
+                  example: "pedro@exemplo.com"
+                password:
+                  type: string
+                  format: password
+                  example: "password123"
+                password_confirmation:
+                  type: string
+                  format: password
+                  example: "password123"
+      responses:
+        '201':
+          description: Usuário registrado com sucesso.
+        '422':
+          description: Erro de validação (ex: email já existe).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /login:
+    post:
+      tags:
+        - Autenticação
+      summary: Autentica um usuário e retorna um token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "admin@admin.com"
+                password:
+                  type: string
+                  format: password
+                  example: "password"
+      responses:
+        '200':
+          description: Login bem-sucedido.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: "1|abc..."
+        '422':
+          description: Credenciais inválidas.
+
+  /funcionarios:
+    get:
+      tags:
+        - Funcionários
+      summary: Lista todos os funcionários
+      description: Retorna uma lista com todos os funcionários cadastrados. Requer autenticação.
+      responses:
+        '200':
+          description: Lista de funcionários retornada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Funcionario'
+        '401':
+          description: Não autorizado (token inválido ou ausente).
+
+    post:
+      tags:
+        - Funcionários
+      summary: Cadastra um novo funcionário
+      description: Adiciona um novo funcionário ao banco de dados. Requer autenticação.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nome, cpf, data_nascimento, telefone, genero]
+              properties:
+                nome:
+                  type: string
+                  example: "Maria Souza"
+                cpf:
+                  type: string
+                  example: "98765432109"
+                data_nascimento:
+                  type: string
+                  format: date
+                  example: "1995-10-20"
+                telefone:
+                  type: string
+                  example: "21912345678"
+                genero:
+                  type: string
+                  enum: [Masculino, Feminino, Outro]
+                  example: "Feminino"
+      responses:
+        '201':
+          description: Funcionário criado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        '401':
+          description: Não autorizado.
+        '422':
+          description: Erro de validação (ex: CPF duplicado).
+
+  /funcionarios/{id}:
+    get:
+      tags:
+        - Funcionários
+      summary: Detalha um funcionário específico
+      description: Retorna os dados de um único funcionário pelo seu ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Dados do funcionário.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        '404':
+          description: Funcionário não encontrado.
+
+    put:
+      tags:
+        - Funcionários
+      summary: Atualiza um funcionário
+      description: Atualiza os dados de um funcionário existente.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              # Schema similar ao de criação, mas nenhum campo é obrigatório
+              $ref: '#/paths/~1funcionarios/post/requestBody/content/application~1json/schema'
+      responses:
+        '200':
+          description: Funcionário atualizado com sucesso.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Funcionario'
+        '404':
+          description: Funcionário não encontrado.
+
+    delete:
+      tags:
+        - Funcionários
+      summary: Remove um funcionário
+      description: Exclui o registro de um funcionário do banco de dados.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '204':
+          description: Funcionário removido com sucesso (sem conteúdo).
+        '404':
+          description: Funcionário não encontrado.
