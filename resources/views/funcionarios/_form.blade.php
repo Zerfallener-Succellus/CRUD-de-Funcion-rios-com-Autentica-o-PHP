@@ -32,5 +32,5 @@
 </div>
 <div class="mt-6 flex items-center justify-end gap-x-6">
     <a href="{{ route('funcionarios.index') }}" class="text-sm font-semibold leading-6 text-gray-900">Cancelar</a>
-    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">Salvar</button>
+    <button type="submit" class="rounded-md bg-orange-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-500">Salvar</button>
 </div>
