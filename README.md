@@ -1,29 +1,8 @@
-Com certeza\!
 
-Agora que o projeto está totalmente dockerizado e automatizado, o `README.md` fica muito mais limpo e profissional. As instruções de instalação e execução são drasticamente simplificadas, o que é um grande benefício da nossa nova estrutura.
-
-Aqui está a versão final e atualizada do `README.md` que reflete o estado atual do seu projeto.
-
------
-
-# 👨‍💻 Desafio: CRUD de Funcionários com Autenticação
+# 👨‍💻: CRUD de Funcionários com Autenticação
 
 Aplicação web completa desenvolvida como parte do desafio para a vaga de programador. O sistema implementa um CRUD (Create, Read, Update, Delete) para gerenciar funcionários, protegido por uma camada de autenticação de usuário e totalmente containerizado com Docker.
 
-## 🖼️ Telas da Aplicação
-
-\<p align="center"\>
-\<em\>(Substitua os links abaixo pelas URLs das suas screenshots)\</em\>
-\</p\>
-\<br\>
-\<p align="center"\>
-\<img src="[https://via.placeholder.com/400x250/6366f1/ffffff?text=Tela+de+Login](https://www.google.com/search?q=https://via.placeholder.com/400x250/6366f1/ffffff%3Ftext%3DTela%2Bde%2BLogin)" width="45%" alt="Tela de Login"\>
-\&nbsp; \&nbsp; \&nbsp;
-\<img src="[https://via.placeholder.com/400x250/10b981/ffffff?text=Listagem+de+Funcionários](https://www.google.com/search?q=https://via.placeholder.com/400x250/10b981/ffffff%3Ftext%3DListagem%2Bde%2BFuncion%C3%A1rios)" width="45%" alt="Listagem de Funcionários"\>
-\</p\>
-\<p align="center"\>
-\<img src="[https://via.placeholder.com/400x250/f59e0b/ffffff?text=Formulário+de+Cadastro](https://www.google.com/search?q=https://via.placeholder.com/400x250/f59e0b/ffffff%3Ftext%3DFormul%C3%A1rio%2Bde%2BCadastro)" width="45%" alt="Formulário de Cadastro/Edição"\>
-\</p\>
 
 ## ✨ Funcionalidades
 
