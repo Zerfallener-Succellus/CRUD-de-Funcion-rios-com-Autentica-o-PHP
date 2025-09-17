@@ -9,13 +9,13 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
-      - ./:/var/www/html
+      - ./:/var/www/html      # CORRIGIDO: Mapeia o código
+      - /var/www/html/vendor # CORRIGIDO: Protege a pasta vendor da imagem
     networks:
       - laravel-net
     depends_on:
       mysql_db:
         condition: service_healthy
-    # --- ADICIONE ESTA LINHA ---
     command: sh -c "php artisan migrate --force && php-fpm"
 
   # Serviço do Servidor Web (Nginx)
@@ -44,7 +44,7 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD:-root}
       MYSQL_USER: ${DB_USERNAME:-user}
     volumes:
-      - ./docker-data/mysql:/var/lib/mysql
+      - mysql_data:/var/lib/mysql # CORRIGIDO: Usando volume nomeado
     ports:
       - "${DB_PORT:-3306}:3306"
     networks:
@@ -54,31 +54,28 @@ services:
        timeout: 20s
        retries: 10
        start_period: 10s
-    
 
-  # --- NOVO SERVIÇO APENAS PARA DESENVOLVIMENTO ---
+  # Serviço para Desenvolvimento (Vite)
   vite:
-    # Usa uma imagem leve do Node.js
     image: node:18-alpine
     container_name: crud_vite
     working_dir: /var/www/html
-    # Mapeia o código da aplicação para dentro do container
     volumes:
-      - ./:/var/www/html
-    # Expõe a porta do Vite
+      - ./:/var/www/html           # Mapeia o código
+      - /var/www/html/node_modules # OTIMIZADO: Protege a pasta node_modules
     ports:
       - "5173:5173"
-    # Comando que será executado ao iniciar o container
     command: sh -c "npm install && npm run dev"
-    
     networks:
       - laravel-net
-    # A MÁGICA: Este serviço só será iniciado quando o perfil 'dev' for ativado
     profiles:
       - dev
-
-    
 
 networks:
   laravel-net:
     driver: bridge
+
+# CORRIGIDO: Declaração do volume nomeado para o MySQL
+volumes:
+  mysql_data:
+    driver: local

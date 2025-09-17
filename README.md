@@ -1,8 +1,6 @@
-
 # 👨‍💻: CRUD de Funcionários com Autenticação
 
 Aplicação web completa desenvolvida como parte do desafio para a vaga de programador. O sistema implementa um CRUD (Create, Read, Update, Delete) para gerenciar funcionários, protegido por uma camada de autenticação de usuário e totalmente containerizado com Docker.
-
 
 ## ✨ Funcionalidades
 
@@ -34,77 +32,81 @@ Para rodar este projeto, você precisa ter apenas:
 
 ## 🚀 Instalação e Execução
 
-O processo para rodar a aplicação é extremamente simples graças ao Docker.
+Siga estes passos para ter a aplicação rodando em poucos minutos.
 
 **1. Clone o Repositório**
 
 ```bash
 git clone https://github.com/Zerfallener-Succellus/CRUD-de-Funcion-rios-com-Autentica-o-PHP
-cd nome-do-projeto
+cd CRUD-de-Funcion-rios-com-Autentica-o-PHP
 ```
 
 **2. Configure o Arquivo de Ambiente**
-Copie o arquivo de exemplo. As configurações padrão já estão prontas para o ambiente Docker.
+Copie o arquivo de exemplo. As configurações padrão já estão prontas para o ambiente Docker e não precisam de alteração.
 
 ```bash
 cp .env.example .env
 ```
 
-**3. Escolha o Modo de Execução**
-
-Você pode iniciar a aplicação em dois modos:
-
-### Modo de Desenvolvimento 👩‍💻
-
-(Com atualização automática do front-end - Hot Reloading)
-
-Execute o seguinte comando para construir as imagens e iniciar todos os containers, incluindo o serviço do Vite para desenvolvimento:
+**3. Suba os Contêineres**
+Este comando irá construir as imagens (na primeira vez) e iniciar todos os serviços em modo de desenvolvimento (com Vite Hot Reloading).
 
 ```bash
 docker-compose --profile dev up -d --build
 ```
 
-  * **Na primeira vez que rodar,** gere a chave da aplicação:
+**4. Execute a Configuração Inicial ❗**
+Com os contêineres rodando, execute os seguintes comandos para finalizar a configuração. **Estes passos são essenciais e só precisam ser feitos uma vez.**
+
+  * **Gerar a Chave da Aplicação:**
+
     ```bash
     docker-compose exec app php artisan key:generate
     ```
 
-### Modo de Produção 📦
+  * **Corrigir Permissões das Pastas:**
+    Este comando ajusta as permissões das pastas `storage` e `bootstrap/cache` para evitar erros de escrita de logs e sessões.
 
-(Simula o ambiente final com os arquivos de front-end compilados e otimizados)
+    ```bash
+    docker-compose exec app chown -R www-data:www-data storage bootstrap/cache
+    ```
 
-Execute este comando para construir a imagem final e iniciar os containers essenciais (sem o Vite Hot Reloading):
+**5. Acesse a Aplicação**
+
+🎉 **Pronto\!** A aplicação estará disponível no seu navegador em: **[http://localhost:8000](https://www.google.com/search?q=http://localhost:8000)**
+
+-----
+
+### Modo de Produção (Alternativo) 📦
+
+Se desejar simular o ambiente de produção (sem o Vite), suba os contêineres com o comando abaixo e siga o **passo 4** de configuração normalmente.
 
 ```bash
 docker-compose up -d --build
 ```
 
-  * **Na primeira vez que rodar,** gere a chave da aplicação:
-    ```bash
-    docker-compose exec app php artisan key:generate
-    ```
+-----
 
-**4. Acesse a Aplicação**
+## ⚙️ Comandos Úteis
 
-🎉 **Pronto\!** A aplicação estará disponível no seu navegador em: **[http://localhost:8000](https://www.google.com/search?q=http://localhost:8000)**
+Aqui estão alguns comandos úteis para gerenciar o ambiente.
 
-## ⚙️ Comandos Úteis do Docker
-
-Aqui estão alguns comandos úteis para gerenciar o ambiente Docker.
-
-  * **Parar todos os containers:**
+  * **Parar o Ambiente:**
+    Para parar todos os contêineres.
 
     ```bash
     docker-compose down
     ```
 
-  * **Parar e remover os volumes do banco (para um reset completo):**
+  * **Reset Completo do Banco de Dados:**
+    Para parar os contêineres e remover o volume do banco de dados (todos os dados serão perdidos).
 
     ```bash
     docker-compose down -v
     ```
 
-  * **Executar comandos `artisan` dentro do container:**
+  * **Executar Comandos `artisan`:**
+    Você pode executar qualquer comando do Laravel dentro do contêiner `app`.
 
     ```bash
     # Exemplo: Rodar migrations e seeders novamente
@@ -114,11 +116,14 @@ Aqui estão alguns comandos úteis para gerenciar o ambiente Docker.
     docker-compose exec app php artisan route:list
     ```
 
-  * **Executar o Composer:**
+  * **Adicionar uma Nova Dependência com Composer:**
 
     ```bash
-    docker-compose exec app composer install
+    docker-compose exec app composer require nome/pacote
     ```
+
+  * **Acessar o Banco de Dados:**
+    Você pode se conectar ao banco de dados usando seu cliente de SQL preferido com as credenciais do arquivo `.env` e a porta `3306`.
 
 -----
 
